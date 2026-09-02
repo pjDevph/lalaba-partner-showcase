@@ -4,6 +4,8 @@ The Expo/React Native app laundromats, home washers, and staff use — bookings,
 
 Talks to the [Lalaba backend](https://github.com/pjDevph/lalaba-backend-showcase) over GraphQL — its sibling is the [Customer app](https://github.com/pjDevph/lalaba-customer-showcase).
 
+<p align="center"><img src="docs/screenshots/app.jpg" width="60%" alt="Lalaba partner app" /></p>
+
 ## What's real here
 
 **Device approval is server-enforced, not a local flag.** Each staff device registers against a specific branch and only works once an owner/admin approves it — see the backend's [`devices.service.ts`](https://github.com/pjDevph/lalaba-backend-showcase/blob/master/src/devices/devices.service.ts) for the actual gate. This app is the client side of that: registration, the approval-pending state, and the branch-scoped session it unlocks.
