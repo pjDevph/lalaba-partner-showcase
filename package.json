@@ -1,0 +1,127 @@
+{
+  "name": "lalaba-merchant-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node start.js --dev-client",
+    "android": "expo run:android --no-install",
+    "ios": "expo run:ios --no-install",
+    "ios:sim": "LALABA_NO_MLKIT=1 expo prebuild --clean -p ios && LALABA_NO_MLKIT=1 expo run:ios",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src app --ext .ts,.tsx",
+    "lint:any": "node scripts/any-ratchet.mjs",
+    "test": "jest",
+    "test:ci": "jest --ci",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "validate:schema": "node scripts/validate-schema.mjs",
+    "sonar": "npm run test:coverage && sonar-scanner -Dsonar.host.url=http://localhost:9000 -Dsonar.token=%SONAR_TOKEN%"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "@testing-library/react-native/matchers",
+      "<rootDir>/jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "^expo-constants$": "<rootDir>/jest/expoConstantsMock.js"
+    },
+    "testMatch": [
+      "**/__tests__/**/*.test.ts",
+      "**/__tests__/**/*.test.tsx"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|zustand|firebase|@firebase)"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "app/**/*.{ts,tsx}",
+      "!src/**/__tests__/**",
+      "!src/types/**",
+      "!src/theme/**",
+      "!src/styles/**",
+      "!src/data/**",
+      "!**/*.d.ts"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ],
+    "coverageDirectory": "coverage"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "11.5.2",
+    "@react-native-firebase/app": "^24.1.1",
+    "@react-native-firebase/app-check": "^24.1.1",
+    "@react-native-firebase/auth": "^24.1.1",
+    "@react-native-firebase/messaging": "^24.1.1",
+    "@react-native-google-signin/google-signin": "16.1.2",
+    "expo": "~55.0.26",
+    "expo-blur": "~55.0.15",
+    "expo-build-properties": "~55.0.14",
+    "expo-camera": "~55.0.19",
+    "expo-constants": "55.0.16",
+    "expo-crypto": "~55.0.15",
+    "expo-document-picker": "~55.0.15",
+    "expo-file-system": "~55.0.22",
+    "expo-font": "55.0.8",
+    "expo-image-manipulator": "~55.0.19",
+    "expo-image-picker": "~55.0.21",
+    "expo-intent-launcher": "~55.0.14",
+    "expo-linking": "~55.0.15",
+    "expo-location": "~55.1.10",
+    "expo-mail-composer": "~55.0.15",
+    "expo-router": "~55.0.16",
+    "expo-secure-store": "~55.0.16",
+    "expo-sharing": "~55.0.20",
+    "expo-splash-screen": "~55.0.21",
+    "expo-status-bar": "~55.0.6",
+    "expo-updates": "~55.0.28",
+    "firebase": "10.14.1",
+    "lucide-react-native": "^0.462.0",
+    "nativewind": "4.2.3",
+    "react": "19.2.0",
+    "react-native": "0.83.6",
+    "react-native-biometrics": "3.0.1",
+    "react-native-gesture-handler": "2.30.1",
+    "react-native-maps": "1.20.1",
+    "react-native-nitro-image": "^0.15.1",
+    "react-native-nitro-modules": "^0.36.5",
+    "react-native-qrcode-svg": "6.3.21",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "5.6.2",
+    "react-native-screens": "4.23.0",
+    "react-native-svg": "15.15.3",
+    "react-native-view-shot": "4.0.3",
+    "react-native-vision-camera": "^5.2.2",
+    "react-native-vision-camera-face-detector": "^2.0.6",
+    "react-native-webview": "13.16.0",
+    "react-native-worklets": "0.7.4",
+    "xlsx": "0.18.5",
+    "zod": "^4.4.3",
+    "zustand": "4.5.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@graphql-inspector/cli": "^6.0.8",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "29.5.14",
+    "@types/react": "19.2.14",
+    "autoprefixer": "10.4.19",
+    "babel-preset-expo": "~55.0.0",
+    "eslint-config-expo": "~55.0.1",
+    "jest": "^29.7.0",
+    "jest-expo": "~55.0.0",
+    "postcss": "8.4.38",
+    "react-refresh": "^0.18.0",
+    "sonarqube-scanner": "^4.3.8",
+    "tailwindcss": "3.4.0",
+    "typescript": "~5.9.2"
+  }
+}

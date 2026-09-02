@@ -1,0 +1,49 @@
+# ─── P0: Merchant Login ───────────────────────────────────────────────────────
+# Gate: P0 — must pass before any other flow can run.
+# Tests: Email + password sign-in for a merchant account.
+# Verifies: App launches cleanly, credentials are accepted, and the merchant
+#           lands on the main tab bar with the POS tab present.
+# ──────────────────────────────────────────────────────────────────────────────
+
+appId: com.lalaba.merchant.dev
+---
+# 1. Launch with a clean slate so no cached session interferes.
+- launchApp:
+    clearState: true
+
+# 2. Wait for the login screen to finish cold-starting.
+#    clearState kills the JS bundle cache so startup takes 10-20 s on an emulator.
+#    extendedWaitUntil blocks until the email field is actually rendered.
+- extendedWaitUntil:
+    visible:
+      text: "Email Address"
+    timeout: 30000
+
+- assertVisible:
+    text: "Sign in to your account"
+    optional: true
+
+# 3. Enter email credential.
+- tapOn:
+    text: "Email Address"
+- inputText: "test@example.com"
+
+# 4. Move to the password field.
+- tapOn:
+    text: "Password"
+- inputText: "testpass123"
+
+# 5. Dismiss keyboard and tap the primary sign-in button.
+- hideKeyboard
+- tapOn:
+    text: "Sign In"
+
+# 6. Wait for navigation to complete (API call + routing can take a few seconds).
+- extendedWaitUntil:
+    visible:
+      text: "POS"
+    timeout: 20000
+
+# 7. Assert merchant tab bar is visible.
+- assertVisible:
+    text: "POS"

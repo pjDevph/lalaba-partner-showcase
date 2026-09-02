@@ -1,0 +1,38 @@
+# ─── Helper: Merchant Login ───────────────────────────────────────────────────
+# NOT a standalone Maestro flow (no appId / --- separator).
+# Callers must invoke via `runFlow` AFTER launchApp has already been called.
+#
+# Usage:
+#   - runFlow: .maestro/_helpers/login.yaml
+#
+# Precondition: App is open and the login screen is visible.
+# Postcondition: Merchant is authenticated; POS tab is visible in the tab bar.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Wait for the login form to settle before interacting.
+- waitForAnimationToEnd
+
+# The "Email Address" label uniquely identifies the email field on all layouts.
+- tapOn:
+    text: "Email Address"
+- inputText: "test@example.com"
+
+# Tap the Password label to focus that field.
+- tapOn:
+    text: "Password"
+- inputText: "testpass123"
+
+# Dismiss the software keyboard so the Sign In button is fully visible.
+- hideKeyboard
+
+# Primary CTA button — renders "Sign In" (login.tsx line 322).
+- tapOn:
+    text: "Sign In"
+
+# Allow time for the Firebase auth call and Expo Router navigation.
+- waitForAnimationToEnd
+
+# Confirm successful login: the merchant tab bar "POS" tab must be visible
+# (portrait: bottom bar TABS array; landscape: sidebar nav item label).
+- assertVisible:
+    text: "POS"

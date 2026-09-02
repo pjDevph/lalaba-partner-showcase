@@ -1,0 +1,53 @@
+# ─── P1: Staff Login ─────────────────────────────────────────────────────────
+# Gate: P1 — staff role is a secondary persona; broken staff login blocks
+#        shift workers but does not immediately stop the merchant from operating.
+# Tests: Email + password sign-in for a staff account.
+# Verifies: Staff lands on the staff tab layout which shows "POS" and "Profile"
+#           tabs (StaffLayout in app/(staff)/_layout.tsx).  There is NO
+#           "Dashboard" or "Settings" tab for staff — those are merchant-only.
+# ──────────────────────────────────────────────────────────────────────────────
+
+appId: com.lalaba.merchant.dev
+---
+# ── 1. Launch fresh ───────────────────────────────────────────────────────────
+- launchApp:
+    clearState: true
+
+# ── 2. Wait for the login screen ─────────────────────────────────────────────
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Email Address"
+
+# ── 3. Enter staff test credentials ──────────────────────────────────────────
+# Use a Firebase account that has the STAFF role assigned to a branch.
+# Replace with real staff test credentials in your CI environment.
+- tapOn:
+    text: "Email Address"
+- inputText: "staff-test@example.com"
+
+- tapOn:
+    text: "Password"
+- inputText: "staffpass123"
+
+- hideKeyboard
+
+# ── 4. Tap Sign In ────────────────────────────────────────────────────────────
+- tapOn:
+    text: "Sign In"
+- waitForAnimationToEnd
+
+# ── 5. Assert the staff tab bar (not the merchant tab bar) ───────────────────
+# Staff tab layout exposes exactly two tabs: "POS" and "Profile"
+# (StaffLayout Tabs.Screen names, _layout.tsx lines 75-76).
+# A "Profile" tab appearing alongside "POS" — but without "Dashboard" —
+# confirms the staff route group is active, not the merchant (tabs) group.
+- assertVisible:
+    text: "POS"
+- assertVisible:
+    text: "Profile"
+
+# ── 6. Confirm absence of merchant-only tabs ──────────────────────────────────
+# "Dashboard" is present only in the merchant tab bar.
+# If it appears, the wrong route group loaded and the test must fail.
+- assertNotVisible:
+    text: "Dashboard"

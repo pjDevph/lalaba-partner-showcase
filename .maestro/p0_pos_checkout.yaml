@@ -1,0 +1,81 @@
+# ─── P0: POS Terminal → Create Order (Cash Checkout) ─────────────────────────
+# Gate: P0 — core revenue path; a broken checkout means zero revenue.
+# Tests: Full order-creation flow from Terminal sub-tab through to the
+#        ClaimTicket modal that confirms the order was created.
+# Depends on: .maestro/_helpers/login.yaml
+# ──────────────────────────────────────────────────────────────────────────────
+
+appId: com.lalaba.merchant.dev
+---
+# ── 1. Start fresh and authenticate ──────────────────────────────────────────
+- launchApp:
+    clearState: true
+
+- runFlow: .maestro/_helpers/login.yaml
+
+# ── 2. Navigate to POS tab ────────────────────────────────────────────────────
+# Portrait: taps the "POS" label in the custom notched bottom tab bar.
+# Landscape: taps "POS Terminal" in the sidebar nav (pos.tsx line 164).
+- tapOn:
+    text: "POS"
+- waitForAnimationToEnd
+
+# ── 3. Make sure the Terminal sub-tab is active ───────────────────────────────
+# The POS screen has three segment tabs: Terminal · Queue · Claim (pos.tsx line 1127-1131).
+# "Terminal" is the default active tab, but we tap it to be explicit.
+- tapOn:
+    text: "Terminal"
+- waitForAnimationToEnd
+
+# ── 4. Enter a customer name ─────────────────────────────────────────────────
+# The customer name TextInput has placeholder "Customer Name *" (pos.tsx line 1804).
+- tapOn:
+    placeholder: "Customer Name *"
+- inputText: "Test Customer"
+- hideKeyboard
+
+# ── 5. Select the first available service card ────────────────────────────────
+# Services render as tappable cards in the Terminal tab's service grid.
+# We scroll down to the service list area and tap the first card encountered.
+# If the branch has no services yet the test will legitimately fail here —
+# seed at least one service in the test environment before running.
+- scrollUntilVisible:
+    element:
+      text: "Add"   # Each service card has an add/select affordance
+    direction: DOWN
+    timeout: 10000
+- tapOn:
+    index: 0
+    text: "Add"
+
+# ── 6. Set payment method to Cash (default in most test environments) ─────────
+# The payment rail shows CASH / GCASH / MAYA / CARD / QPH chips.
+# Tapping "Cash" ensures no QR modal is triggered.
+- tapOn:
+    text: "Cash"
+
+# ── 7. Tap Create Order ───────────────────────────────────────────────────────
+# Button label: "Create Order" when no order exists; "Order created ✓" after.
+# (pos.tsx getOrderActionLabel, line 1556)
+- tapOn:
+    text: "Create Order"
+- waitForAnimationToEnd
+
+# ── 8. Assert ClaimTicket modal appeared ──────────────────────────────────────
+# After a successful order the ClaimTicket modal shows "Order Created" in its
+# header and "CLAIM CODE" as an eyebrow label (ClaimTicket.tsx lines 223, 330).
+- assertVisible:
+    text: "Order Created"
+- assertVisible:
+    text: "CLAIM CODE"
+
+# ── 9. Verify action buttons are present (sanity) ────────────────────────────
+- assertVisible:
+    text: "New Order"
+
+# ── 10. Close the claim ticket and return to Terminal ─────────────────────────
+- tapOn:
+    text: "New Order"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Terminal"

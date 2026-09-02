@@ -1,0 +1,89 @@
+# ─── P0: POS Claim Tab → Look Up & Release Order ─────────────────────────────
+# Gate: P0 — customer pickup is the last step of every order; breakage here
+#        means customers cannot retrieve their laundry.
+# Tests: Entering a claim code in the Claim sub-tab, matching an order that is
+#        READY_FOR_PICKUP, reviewing the release confirmation, and releasing it.
+# Depends on: .maestro/_helpers/login.yaml
+#
+# NOTE: "TEST01" is a placeholder claim code. In CI, replace it with a real
+#       code seeded by a setup script or captured from a prior p0_pos_checkout
+#       flow run.  The Claim tab requires the order to have status
+#       READY_FOR_PICKUP; orders that are still CREATED / PROCESSING will match
+#       but show an informational "not ready" state instead.
+# ──────────────────────────────────────────────────────────────────────────────
+
+appId: com.lalaba.merchant.dev
+---
+# ── 1. Start fresh and authenticate ──────────────────────────────────────────
+- launchApp:
+    clearState: true
+
+- runFlow: .maestro/_helpers/login.yaml
+
+# ── 2. Navigate to the POS tab ────────────────────────────────────────────────
+- tapOn:
+    text: "POS"
+- waitForAnimationToEnd
+
+# ── 3. Switch to the Claim sub-tab ───────────────────────────────────────────
+# The segment bar shows Terminal · Queue · Claim (pos.tsx line 1130).
+- tapOn:
+    text: "Claim"
+- waitForAnimationToEnd
+
+# ── 4. Enter the claim code ───────────────────────────────────────────────────
+# The Claim tab has a large TextInput whose placeholder is "A3F9"
+# (pos.tsx line 4004 — placeholder is deliberately short to hint format).
+# The field auto-converts input to uppercase; enter any case.
+# Live matching triggers once the normalised input is >= 4 chars long.
+- tapOn:
+    placeholder: "A3F9"
+- inputText: "TEST01"
+- waitForAnimationToEnd
+
+# ── 5. Assert order details appear ────────────────────────────────────────────
+# When a matching READY_FOR_PICKUP order is found, the Claim tab renders:
+#   - A "Ready" chip (Chip variant="success", pos.tsx line 3861)
+#   - A "Review Release" button (matchedClaimBtn, pos.tsx line 3865 / 4066)
+# If no match is found here the seed data is missing — fix before re-running.
+- assertVisible:
+    text: "Ready"
+- assertVisible:
+    text: "Review Release"
+
+# ── 6. Open the release confirmation modal ────────────────────────────────────
+# Tapping "Review Release" opens the Release Order modal (pos.tsx line 3896).
+- tapOn:
+    text: "Review Release"
+- waitForAnimationToEnd
+
+# ── 7. Verify the release modal content ───────────────────────────────────────
+# Modal header: "Release Order?" (pos.tsx line 3896)
+# Sub-heading:  "Verify claim code before releasing" (pos.tsx line 3300)
+- assertVisible:
+    text: "Release Order?"
+- assertVisible:
+    text: "Verify claim code before releasing"
+
+# ── 8. Tick the "Claim code verified" checkbox ───────────────────────────────
+# The Release CTA is disabled until codeChecked is true (pos.tsx line 3970).
+# The checkbox label is "Claim code verified" (pos.tsx line 3921).
+- tapOn:
+    text: "Claim code verified"
+
+# ── 9. Confirm the release ────────────────────────────────────────────────────
+# The primary action button inside the modal is enabled once codeChecked is
+# true. It does not have a static text label in source — it inherits from the
+# pmActions container. We identify it by asserting the "Release" text that
+# appears on the confirm button (the cancel alternative reads "Cancel").
+- tapOn:
+    text: "Release"
+- waitForAnimationToEnd
+
+# ── 10. Assert order is now marked as claimed / released ─────────────────────
+# After a successful gqlProcessPickup call the queue store updates the order
+# status to CLAIMED and the success notification reads:
+# "Order released" (pos.tsx line 3490).
+# On the Claim tab, the input is cleared and the UI returns to idle.
+- assertVisible:
+    text: "Order released"

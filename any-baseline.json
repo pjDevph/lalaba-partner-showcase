@@ -1,0 +1,7 @@
+{
+  "_": "GAP-TYPE-001 ceiling for @typescript-eslint/no-explicit-any. These numbers may only go DOWN — see scripts/any-ratchet.mjs. Lower them in the same PR that removes the debt.",
+  "targets": ["src", "app"],
+  "source": 100,
+  "spec": 46,
+  "enforceSpec": true
+}
